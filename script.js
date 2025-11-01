@@ -1,35 +1,21 @@
-// Folders containing your designs
-const imageFolders = ['logo', 'posters', 'flyers', 'others'];
-
-// Possible image file types
-const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-
-// Where the images will be shown
+// Dynamically display all images from each folder
+const folders = ['logo', 'posters', 'flyers', 'others'];
 const galleryContainer = document.getElementById('gallery-container');
 
-// Loop through folders and possible file types
-imageFolders.forEach(folder => {
-  for (let i = 1; i <= 10; i++) { // supports up to 10 images per folder
-    let found = false;
+folders.forEach(folder => {
+  // Create a section title for each category
+  const title = document.createElement('h3');
+  title.textContent = folder.charAt(0).toUpperCase() + folder.slice(1);
+  galleryContainer.appendChild(title);
 
-    imageExtensions.forEach(ext => {
-      if (found) return; // skip if one was already loaded
-
+  // Try to load up to 50 possible image names (JPG, PNG, WEBP, JPEG)
+  for (let i = 1; i <= 50; i++) {
+    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+    extensions.forEach(ext => {
       const img = new Image();
-      img.src = `images/${folder}/work${i}.${ext}`;
+      img.src = `images/${folder}/image${i}.${ext}`;
       img.alt = `${folder} design ${i}`;
-
-      img.onload = () => {
-        galleryContainer.appendChild(img);
-        found = true; // stop checking other extensions once one works
-      };
-
-      img.onerror = () => {
-        // ignore errors silently for missing files
-      };
+      img.onload = () => galleryContainer.appendChild(img);
     });
   }
 });
-
-// Update footer year automatically
-document.getElementById("year").textContent = new Date().getFullYear();
