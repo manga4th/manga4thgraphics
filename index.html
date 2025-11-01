@@ -3,47 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manga4th Graphics</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Manga4th Graphics – Creative Visual Branding</title>
 
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Manga4th Graphics</h1>
-    <p>Creative Graphic Designs & Visual Branding</p>
+
+  <!-- ====================== HEADER ====================== -->
+  <header class="header">
+    <div class="container">
+      <h1 class="header__title">Manga4th Graphics</h1>
+      <p class="header__tagline">Creative Graphic Designs &amp; Visual Branding</p>
+    </div>
   </header>
 
-  <section class="contact">
-    <p>📞 09075752588 | 📸 Instagram: <a href="https://instagram.com/manga4th" target="_blank">@manga4th</a></p>
+  <!-- ====================== CONTACT BAR ====================== -->
+  <section class="contact-bar container">
+    <p>
+      <span class="material-icons">phone</span> 09075752588
+      &nbsp;|&nbsp;
+      <span class="material-icons">photo_camera</span>
+      Instagram: <a href="https://instagram.com/manga4th" target="_blank" rel="noopener">@manga4th</a>
+    </p>
   </section>
 
-  <main id="gallery-container"></main>
+  <!-- ====================== GALLERY ====================== -->
+  <main id="gallery-container" class="container"></main>
 
-  <footer>
-    <p>&copy; <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
+    </div>
   </footer>
-  <!-- Full Image Modal -->
-<div class="modal" id="imageModal">
-  <img id="modalImage" src="" alt="Full view">
-</div>
 
-<script>
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('modalImage');
+  <!-- ====================== MODAL ====================== -->
+  <div class="modal" id="imageModal" aria-hidden="true" role="dialog">
+    <button class="modal__close" aria-label="Close modal">
+      <span class="material-icons">close</span>
+    </button>
+    <img id="modalImage" src="" alt="" loading="lazy">
+  </div>
 
-  document.querySelectorAll('#gallery-container img').forEach(img => {
-    img.addEventListener('click', () => {
-      modal.classList.add('active');
-      modalImg.src = img.src;
-    });
-  });
-
-  modal.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-</script>
-
-  <script src="script.js"></script>
+  <!-- ====================== SCRIPTS ====================== -->
+  <script src="script.js" defer></script>
 </body>
 </html>
