@@ -5,25 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manga4th Graphics</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
 </head>
 <body>
   <header>
     <h1>Manga4th Graphics</h1>
-    <p class="tagline">Creative Designs that Speak Volumes</p>
+    <p>Creative Graphic Designs & Visual Branding</p>
   </header>
 
-  <section class="gallery" id="gallery">
-    <h2>My Works</h2>
-    <div class="gallery-container" id="gallery-container">
-      <!-- Images will load here dynamically -->
-    </div>
+  <section class="contact">
+    <p>📞 09075752588 | 📸 Instagram: <a href="https://instagram.com/manga4th" target="_blank">@manga4th</a></p>
   </section>
 
+  <main id="gallery-container"></main>
+
   <footer>
-    <p>📞 Call: <a href="tel:09075752588">09075752588</a></p>
-    <p>📸 Instagram: <a href="https://instagram.com/manga4th" target="_blank">@manga4th</a></p>
-    <p>© <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
+    <p>&copy; <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
   </footer>
+  <!-- Full Image Modal -->
+<div class="modal" id="imageModal">
+  <img id="modalImage" src="" alt="Full view">
+</div>
+
+<script>
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+
+  document.querySelectorAll('#gallery-container img').forEach(img => {
+    img.addEventListener('click', () => {
+      modal.classList.add('active');
+      modalImg.src = img.src;
+    });
+  });
+
+  modal.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+</script>
 
   <script src="script.js"></script>
 </body>
