@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Poppins:wght@700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -18,31 +19,40 @@
     <h1>MANGA4TH GRAPHICS</h1>
   </header>
 
-  <!-- LOGO -->
+  <!-- LOGO (Centered) -->
   <div class="logo-container">
-    <img src="images/logo/manga4th-logo.png" alt="Manga4th Logo" class="main-logo" loading="eager">
+    <img src="images/logo/manga4th-logo.png" alt="Manga4th Graphics Logo" class="main-logo" loading="eager">
   </div>
 
-  <!-- GRID BUTTONS -->
+  <!-- CATEGORY BUTTONS -->
   <div class="button-grid">
-    <button class="category-btn" data-category="logo">Logos</button>
-    <button class="category-btn" data-category="posters">Posters</button>
-    <button class="category-btn" data-category="flyers">Flyers</button>
-    <button class="category-btn" data-category="others">Others</button>
+    <button class="category-btn" data-cat="logo">Logos</button>
+    <button class="category-btn" data-cat="posters">Posters</button>
+    <button class="category-btn" data-cat="flyers">Flyers</button>
+    <button class="category-btn" data-cat="others">Others</button>
   </div>
 
-  <!-- VIEWER -->
+  <!-- DEBUG -->
+  <div id="debug" style="color: #0f0; text-align: center; padding: 8px; font-family: monospace; font-size: 0.9rem;"></div>
+
+  <!-- IMAGE VIEWER -->
   <div id="viewer" class="viewer hidden">
-    <button class="nav-btn prev-btn"><span class="material-icons">arrow_back</span></button>
+    <button class="nav-btn prev-btn">
+      <span class="material-icons">arrow_back</span>
+    </button>
     <img id="gallery-img" src="" alt="" loading="lazy">
-    <button class="nav-btn next-btn"><span class="material-icons">arrow_forward</span></button>
+    <button class="nav-btn next-btn">
+      <span class="material-icons">arrow_forward</span>
+    </button>
+    <div class="image-counter" id="image-counter"></div>
   </div>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>© <span id="year"></span> Manga4th Graphics</p>
+    <p>© <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
   </footer>
 
+  <!-- JavaScript -->
   <script src="script.js" defer></script>
 </body>
 </html>
