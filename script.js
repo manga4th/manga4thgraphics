@@ -1,19 +1,20 @@
-/* -------------------------------------------------
-   Gallery Builder + Modal Logic
-------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  const galleryContainer = document.getElementById('gallery-container');
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('modalImage');
-  const closeBtn = document.querySelector('.modal__close');
+  // DOM Elements
+  const buttons = document.querySelectorAll('.category-btn');
+  const viewer = document.getElementById('viewer');
+  const img = document.getElementById('gallery-img');
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
 
-  // ---------- Image data ----------
-  const images = {
+  // === IMAGE DATA (MUST MATCH FOLDER NAMES EXACTLY) ===
+  const galleries = {
     logo: [
       "AV.png","chillwave.png","gh_cupcake.png","halal.png","Nusham.png",
       "saqi.png","Thirsty.png","twin.png","zarak.png","AKU.png"
     ],
-    posters: ["Anniversary.png","ayranniv.png","dedication.png","20.png"],
+    posters: [
+      "Anniversary.png","ayranniv.png","dedication.png","20.png"
+    ],
     flyers: [
       "MENU.png","menu33.png","Najah's Henna.png","palm oil.png","randb.png",
       "sud3.png","sudtxt.png","wooden.png","wooden_2.png","zcard.png",
@@ -28,63 +29,78 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
-  // ---------- Create a section ----------
-  const createSection = (title, folder, files) => {
-    const section = document.createElement('section');
-    section.className = 'gallery-section';
+  let currentGallery = [];
+  let currentIndex = 0;
+  let currentCategory = '';
 
-    const heading = document.createElement('h2');
-    heading.textContent = title;
-    heading.className = 'gallery-section__title';
-    section.appendChild(heading);
+  // === BUTTON CLICK ===
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Reset active
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-    const grid = document.createElement('div');
-    grid.className = 'gallery-grid';
+      // Get category
+      const category = btn.getAttribute('data-category'); // EXACT string
+      if (!galleries[category]) {
+        console.error(`No gallery found for: ${category}`);
+        return;
+      }
 
-    files.forEach(file => {
-      const img = document.createElement('img');
-      img.src = `images/${folder}/${file}`;
-      img.alt = `${title} – ${file.split('.')[0]}`;
-      img.loading = 'lazy';
-      img.dataset.src = img.src;               // keep original for modal
-      img.onerror = () => img.remove();        // hide broken images
-      grid.appendChild(img);
+      currentCategory = category;
+      currentGallery = galleries[category];
+      currentIndex = 0;
+
+      viewer.classList.remove('hidden');
+      loadImage();
     });
-
-    section.appendChild(grid);
-    galleryContainer.appendChild(section);
-  };
-
-  // ---------- Build all sections ----------
-  createSection('Logos',   'logo',   images.logo);
-  createSection('Posters', 'posters', images.posters);
-  createSection('Flyers',  'flyers',  images.flyers);
-  createSection('Others',  'others',  images.others);
-
-  // ---------- Modal (delegated) ----------
-  galleryContainer.addEventListener('click', e => {
-    const img = e.target.closest('img');
-    if (!img) return;
-    modalImg.src = img.dataset.src || img.src;
-    modalImg.alt = img.alt;
-    modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
   });
 
-  const closeModal = () => {
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    modalImg.src = '';
-  };
-  closeBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', e => {
-    if (e.target === modal) closeModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
-  });
+  // === LOAD IMAGE ===
+  function loadImage() {
+    if (!currentGallery || currentGallery.length === 0) return;
 
-  // ---------- Dynamic year ----------
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+    const file = currentGallery[currentIndex];
+    const path = `images/${currentCategory}/${file}`;
+
+    // Debug
+    console.log('Loading:', path);
+
+    // Set image
+    img.src = path;
+    img.alt = `${currentCategory} - ${file}`;
+
+    // Fallback if image fails
+    img.onerror = () => {
+      img.src = 'images/logo/manga4th-logo.png'; // fallback
+      img.alt = 'Image not found';
+    };
+  }
+
+  // === NAVIGATION ===
+  prevBtn.addEventListener('click', () => navigate(-1));
+  nextBtn.addEventListener('click', () => navigate(1));
+
+  function navigate(direction) {
+    if (currentGallery.length === 0) return;
+    currentIndex = (currentIndex + direction + currentGallery.length) % currentGallery.length;
+    loadImage();
+  }
+
+  // === SWIPE ===
+  let touchStartX = 0;
+  viewer.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  viewer.addEventListener('touchend', e => {
+    if (currentGallery.length === 0) return;
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      navigate(diff > 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  // === YEAR ===
+  document.getElementById('year').textContent = new Date().getFullYear();
 });
