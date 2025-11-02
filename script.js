@@ -4,19 +4,43 @@ document.addEventListener('DOMContentLoaded', function() {
   const img = document.getElementById('gallery-img');
   const prevBtn = document.querySelector('.prev-btn');
   const nextBtn = document.querySelector('.next-btn');
-  const debug = document.getElementById('debug');
   const imageCounter = document.getElementById('image-counter');
 
+  // Clean file names - remove problematic characters and ensure proper extensions
   const galleries = {
-    logo: ["AV.png","chillwave.png","gh_cupcake.png","halal.png","Nusham.png","saqi.png","Thirsty.png","twin.png","zarak.png","AKU.png"],
-    posters: ["Anniversary.png","ayranniv.png","dedication.png","20.png"],
-    flyers: ["MENU.png","menu33.png","Najah's Henna.png","palm oil.png","randb.png","sud3.png","sudtxt.png","wooden.png","wooden_2.png","zcard.png","2_Miki's Kitchen.png","3_from the millers.png","4_Sudawa Textile.png","5_End of the year sales discount.png","6_Copy of BEST.png","BEST.jpg","business_ari.png","business_ari2.png","easy.png","flch.png","fmasu.png","gurasa.png","hijab.png","mc.png"],
-    others: ["Left HighTable.png","mar_2.png","noti.png","Save_the_Date.png","yaaya.png","Aborisade.png","Civ_iv_msaid.png","faruk.png"]
+    logo: [
+      "AV.png", "chillwave.png", "gh_cupcake.png", "halal.png", "Nusham.png",
+      "saqi.png", "Thirsty.png", "twin.png", "zarak.png", "AKU.png"
+    ],
+    posters: [
+      "Anniversary.png", "ayranniv.png", "dedication.png", "20.png"
+    ],
+    flyers: [
+      "MENU.png", "menu33.png", "Najahs_Henna.png", "palm_oil.png", "randb.png",
+      "sud3.png", "sudtxt.png", "wooden.png", "wooden_2.png", "zcard.png",
+      "Mikis_Kitchen.png", "from_the_millers.png", "Sudawa_Textile.png",
+      "End_of_the_year_sales_discount.png", "Copy_of_BEST.png", "BEST.jpg",
+      "business_ari.png", "business_ari2.png", "easy.png", "flch.png", "fmasu.png",
+      "gurasa.png", "hijab.png", "mc.png"
+    ],
+    others: [
+      "Left_HighTable.png", "mar_2.png", "noti.png", "Save_the_Date.png",
+      "yaaya.png", "Aborisade.png", "Civ_iv_msaid.png", "faruk.png"
+    ]
   };
 
   let currentGallery = [];
   let currentIndex = 0;
   let currentCat = '';
+
+  // Function to clean file names for mobile
+  function cleanFileName(filename) {
+    return filename
+      .replace(/[']/g, '') // Remove apostrophes
+      .replace(/[&]/g, 'and') // Replace & with 'and'
+      .replace(/[^\w.-]/g, '_') // Replace special characters with underscore
+      .replace(/\s+/g, '_'); // Replace spaces with underscore
+  }
 
   buttons.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -26,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const cat = this.getAttribute('data-cat');
       
       if (!galleries[cat] || galleries[cat].length === 0) {
-        debug.textContent = `No images in ${cat} category`;
         viewer.classList.add('hidden');
         return;
       }
@@ -43,48 +66,86 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadImage() {
     if (currentGallery.length === 0) return;
 
-    const file = currentGallery[currentIndex];
-    const path = `images/${currentCat}/${file}`;
+    const originalFile = currentGallery[currentIndex];
+    const cleanFile = cleanFileName(originalFile);
+    const path = `images/${currentCat}/${cleanFile}`;
 
-    debug.textContent = `Loading: ${file}`;
-    img.src = path;
-    img.alt = file;
+    // Show loading state
+    img.classList.add('image-loading');
+    img.classList.remove('image-error');
 
-    img.onload = function() {
-      debug.textContent = `Loaded: ${file} (${currentIndex + 1}/${currentGallery.length})`;
+    // Create a new image object to test loading
+    const testImage = new Image();
+    
+    testImage.onload = function() {
+      // Set the actual image source
+      img.src = path;
+      img.alt = `Manga4th Graphics - ${currentCat}`;
+      img.classList.remove('image-loading');
       updateImageCounter();
     };
 
-    img.onerror = function() {
-      debug.textContent = `Failed to load: ${file}`;
+    testImage.onerror = function() {
+      // Try with original filename if cleaned version fails
+      const fallbackPath = `images/${currentCat}/${originalFile}`;
+      const fallbackImage = new Image();
+      
+      fallbackImage.onload = function() {
+        img.src = fallbackPath;
+        img.alt = `Manga4th Graphics - ${currentCat}`;
+        img.classList.remove('image-loading');
+        updateImageCounter();
+      };
+
+      fallbackImage.onerror = function() {
+        // Both paths failed, show error state and try next image
+        img.classList.remove('image-loading');
+        img.classList.add('image-error');
+        img.src = '';
+        
+        // Try next image after a short delay
+        setTimeout(() => {
+          if (currentGallery.length > 1) {
+            navigate(1);
+          }
+        }, 1000);
+      };
+
+      fallbackImage.src = fallbackPath;
     };
+
+    testImage.src = path;
   }
 
   function updateImageCounter() {
     if (currentGallery.length > 0) {
       imageCounter.textContent = `${currentIndex + 1} / ${currentGallery.length}`;
+    } else {
+      imageCounter.textContent = '';
     }
   }
 
-  prevBtn.addEventListener('click', function() {
+  function navigate(direction) {
     if (currentGallery.length <= 1) return;
-    currentIndex = (currentIndex - 1 + currentGallery.length) % currentGallery.length;
+    currentIndex = (currentIndex + direction + currentGallery.length) % currentGallery.length;
     loadImage();
+  }
+
+  prevBtn.addEventListener('click', function() {
+    navigate(-1);
   });
 
   nextBtn.addEventListener('click', function() {
-    if (currentGallery.length <= 1) return;
-    currentIndex = (currentIndex + 1) % currentGallery.length;
-    loadImage();
+    navigate(1);
   });
 
   document.addEventListener('keydown', function(e) {
     if (viewer.classList.contains('hidden')) return;
     
     if (e.key === 'ArrowLeft') {
-      prevBtn.click();
+      navigate(-1);
     } else if (e.key === 'ArrowRight') {
-      nextBtn.click();
+      navigate(1);
     } else if (e.key === 'Escape') {
       viewer.classList.add('hidden');
     }
@@ -103,9 +164,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        nextBtn.click();
+        navigate(1);
       } else {
-        prevBtn.click();
+        navigate(-1);
       }
     }
   });
@@ -116,5 +177,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Set current year
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Preload main logo for faster display
+  const mainLogo = new Image();
+  mainLogo.src = 'images/logo/manga4th-logo.png';
 });
