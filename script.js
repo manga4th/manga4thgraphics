@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const nextBtn = document.querySelector('.next-btn');
   const imageCounter = document.getElementById('image-counter');
 
-  // Clean file names - remove problematic characters and ensure proper extensions
+  // ALL flyer files included since you have them all
   const galleries = {
     logo: [
       "AV.png", "chillwave.png", "gh_cupcake.png", "halal.png", "Nusham.png",
@@ -16,12 +16,30 @@ document.addEventListener('DOMContentLoaded', function() {
       "Anniversary.png", "ayranniv.png", "dedication.png", "20.png"
     ],
     flyers: [
-      "MENU.png", "menu33.png", "Najahs_Henna.png", "palm_oil.png", "randb.png",
-      "sud3.png", "sudtxt.png", "wooden.png", "wooden_2.png", "zcard.png",
-      "Mikis_Kitchen.png", "from_the_millers.png", "Sudawa_Textile.png",
-      "End_of_the_year_sales_discount.png", "Copy_of_BEST.png", "BEST.jpg",
-      "business_ari.png", "business_ari2.png", "easy.png", "flch.png", "fmasu.png",
-      "gurasa.png", "hijab.png", "mc.png"
+      "MENU.png", 
+      "menu33.png", 
+      "Najahs_Henna.png", 
+      "palm_oil.png", 
+      "randb.png",
+      "sud3.png", 
+      "sudtxt.png", 
+      "wooden.png", 
+      "wooden_2.png", 
+      "zcard.png",
+      "Mikis_Kitchen.png", 
+      "from_the_millers.png", 
+      "Sudawa_Textile.png",
+      "End_of_the_year_sales_discount.png", 
+      "Copy_of_BEST.png", 
+      "BEST.jpg",
+      "business_ari.png", 
+      "business_ari2.png", 
+      "easy.png", 
+      "flch.png", 
+      "fmasu.png",
+      "gurasa.png", 
+      "hijab.png", 
+      "mc.png"
     ],
     others: [
       "Left_HighTable.png", "mar_2.png", "noti.png", "Save_the_Date.png",
@@ -32,15 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentGallery = [];
   let currentIndex = 0;
   let currentCat = '';
-
-  // Function to clean file names for mobile
-  function cleanFileName(filename) {
-    return filename
-      .replace(/[']/g, '') // Remove apostrophes
-      .replace(/[&]/g, 'and') // Replace & with 'and'
-      .replace(/[^\w.-]/g, '_') // Replace special characters with underscore
-      .replace(/\s+/g, '_'); // Replace spaces with underscore
-  }
 
   buttons.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -59,62 +68,38 @@ document.addEventListener('DOMContentLoaded', function() {
       currentIndex = 0;
 
       viewer.classList.remove('hidden');
-      loadImage();
+      loadCurrentImage();
     });
   });
 
-  function loadImage() {
+  function loadCurrentImage() {
     if (currentGallery.length === 0) return;
 
-    const originalFile = currentGallery[currentIndex];
-    const cleanFile = cleanFileName(originalFile);
-    const path = `images/${currentCat}/${cleanFile}`;
+    const fileName = currentGallery[currentIndex];
+    const imagePath = `images/${currentCat}/${fileName}`;
 
-    // Show loading state
-    img.classList.add('image-loading');
-    img.classList.remove('image-error');
-
-    // Create a new image object to test loading
-    const testImage = new Image();
+    console.log('Loading image:', imagePath); // Debug log
     
-    testImage.onload = function() {
-      // Set the actual image source
-      img.src = path;
-      img.alt = `Manga4th Graphics - ${currentCat}`;
-      img.classList.remove('image-loading');
+    img.src = imagePath;
+    img.alt = `Manga4th Graphics - ${currentCat}`;
+
+    img.onload = function() {
+      console.log('Successfully loaded:', imagePath);
       updateImageCounter();
     };
 
-    testImage.onerror = function() {
-      // Try with original filename if cleaned version fails
-      const fallbackPath = `images/${currentCat}/${originalFile}`;
-      const fallbackImage = new Image();
-      
-      fallbackImage.onload = function() {
-        img.src = fallbackPath;
-        img.alt = `Manga4th Graphics - ${currentCat}`;
-        img.classList.remove('image-loading');
-        updateImageCounter();
-      };
-
-      fallbackImage.onerror = function() {
-        // Both paths failed, show error state and try next image
-        img.classList.remove('image-loading');
-        img.classList.add('image-error');
-        img.src = '';
-        
-        // Try next image after a short delay
-        setTimeout(() => {
-          if (currentGallery.length > 1) {
-            navigate(1);
-          }
-        }, 1000);
-      };
-
-      fallbackImage.src = fallbackPath;
+    img.onerror = function() {
+      console.error('FAILED to load:', imagePath);
+      // Try next image if this one fails
+      setTimeout(() => {
+        if (currentGallery.length > 1) {
+          console.log('Trying next image...');
+          navigate(1);
+        }
+      }, 1000);
     };
 
-    testImage.src = path;
+    updateImageCounter();
   }
 
   function updateImageCounter() {
@@ -127,8 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function navigate(direction) {
     if (currentGallery.length <= 1) return;
+    
     currentIndex = (currentIndex + direction + currentGallery.length) % currentGallery.length;
-    loadImage();
+    loadCurrentImage();
   }
 
   prevBtn.addEventListener('click', function() {
@@ -151,25 +137,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  let startX = 0;
+  let touchStartX = 0;
+  
   viewer.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-  });
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
 
   viewer.addEventListener('touchend', function(e) {
-    if (!startX || currentGallery.length <= 1) return;
+    if (!touchStartX || currentGallery.length <= 1) return;
     
-    const endX = e.changedTouches[0].clientX;
-    const diff = startX - endX;
+    const touchEndX = e.changedTouches[0].clientX;
+    const swipeDistance = touchStartX - touchEndX;
     
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
+    if (Math.abs(swipeDistance) > 50) {
+      if (swipeDistance > 0) {
         navigate(1);
       } else {
         navigate(-1);
       }
     }
-  });
+    
+    touchStartX = 0;
+  }, { passive: true });
 
   viewer.addEventListener('click', function(e) {
     if (e.target === this) {
@@ -177,10 +166,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Set current year
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // Preload main logo for faster display
-  const mainLogo = new Image();
-  mainLogo.src = 'images/logo/manga4th-logo.png';
 });
