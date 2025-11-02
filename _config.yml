@@ -1,0 +1,13 @@
+title: Manga4th Graphics
+description: Professional graphics portfolio
+baseurl: ""
+url: "https://yourusername.github.io"
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []

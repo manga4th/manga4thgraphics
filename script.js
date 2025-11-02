@@ -6,55 +6,72 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = document.querySelector('.next-btn');
   const debug = document.getElementById('debug');
   const imageCounter = document.getElementById('image-counter');
+  const loadingScreen = document.getElementById('loading-screen');
 
-  // FULL GALLERY DATA - WITH CASE CORRECTIONS
   const galleries = {
     logo: [
-      "AV.png", "chillwave.png", "gh_cupcake.png", "halal.png", "Nusham.png",
-      "saqi.png", "Thirsty.png", "twin.png", "zarak.png", "AKU.png"
+      "AV.png","chillwave.png","gh_cupcake.png","halal.png","Nusham.png",
+      "saqi.png","Thirsty.png","twin.png","zarak.png","AKU.png"
     ],
     posters: [
-      "Anniversary.png", "ayranniv.png", "dedication.png", "20.png"
+      "Anniversary.png","ayranniv.png","dedication.png","20.png"
     ],
     flyers: [
-      "MENU.png", "menu33.png", "Najah's Henna.png", "palm oil.png", "randb.png",
-      "sud3.png", "sudtxt.png", "wooden.png", "wooden_2.png", "zcard.png",
-      "2_Miki's Kitchen.png", "3_from the millers.png", "4_Sudawa Textile.png",
-      "5_End of the year sales discount.png", "6_Copy of BEST.png", "BEST.jpg",
-      "business_ari.png", "business_ari2.png", "easy.png", "flch.png", "fmasu.png",
-      "gurasa.png", "hijab.png", "mc.png"
+      "MENU.png","menu33.png","Najah's Henna.png","palm oil.png","randb.png",
+      "sud3.png","sudtxt.png","wooden.png","wooden_2.png","zcard.png",
+      "2_Miki's Kitchen.png","3_from the millers.png","4_Sudawa Textile.png",
+      "5_End of the year sales discount.png","6_Copy of BEST.png","BEST.jpg",
+      "business_ari.png","business_ari2.png","easy.png","flch.png","fmasu.png",
+      "gurasa.png","hijab.png","mc.png"
     ],
     others: [
-      "Left HighTable.png", "mar_2.png", "noti.png", "Save_the_Date.png",
-      "yaaya.png", "Aborisade.png", "Civ_iv_msaid.png", "faruk.png"
+      "Left HighTable.png","mar_2.png","noti.png","Save_the_Date.png",
+      "yaaya.png","Aborisade.png","Civ_iv_msaid.png","faruk.png"
     ]
   };
 
   let currentGallery = [];
   let currentIndex = 0;
   let currentCat = '';
+  let preloadedIndexes = new Set();
 
-  // BUTTON CLICK
+  function preloadFirstImages() {
+    Object.keys(galleries).forEach(cat => {
+      if (galleries[cat].length > 0) {
+        const preloadImg = new Image();
+        preloadImg.src = `images/${cat}/${galleries[cat][0]}`;
+      }
+    });
+  }
+
+  function preloadAdjacentImages() {
+    if (currentGallery.length <= 1) return;
+
+    const indexesToPreload = [
+      (currentIndex - 1 + currentGallery.length) % currentGallery.length,
+      (currentIndex + 1) % currentGallery.length
+    ];
+
+    indexesToPreload.forEach(index => {
+      if (!preloadedIndexes.has(index)) {
+        const preloadImg = new Image();
+        const file = currentGallery[index];
+        preloadImg.src = `images/${currentCat}/${file}`;
+        preloadedIndexes.add(index);
+      }
+    });
+  }
+
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
       console.log('Button clicked:', btn.getAttribute('data-cat'));
       
-      // Remove active class from all buttons
       buttons.forEach(b => b.classList.remove('active'));
-      // Add active class to clicked button
       btn.classList.add('active');
 
       const cat = btn.getAttribute('data-cat');
       
-      // Check if category exists
-      if (!galleries[cat]) {
-        debug.textContent = `No gallery defined for ${cat}`;
-        viewer.classList.add('hidden');
-        return;
-      }
-
-      // Check if category has images
-      if (galleries[cat].length === 0) {
+      if (!galleries[cat] || galleries[cat].length === 0) {
         debug.textContent = `No images in ${cat} category`;
         viewer.classList.add('hidden');
         return;
@@ -63,8 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
       currentCat = cat;
       currentGallery = galleries[cat];
       currentIndex = 0;
+      preloadedIndexes.clear();
+      preloadedIndexes.add(0);
 
-      // Show viewer and load first image
       viewer.classList.remove('hidden');
       loadImage();
       
@@ -72,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // LOAD IMAGE FUNCTION
   function loadImage() {
     if (currentGallery.length === 0) {
       debug.textContent = 'No images to display';
@@ -81,69 +98,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const file = currentGallery[currentIndex];
+    const path = `images/${currentCat}/${file}`;
+
+    debug.textContent = `Loading: ${file}...`;
     
-    // Try different path variations
-    const pathVariations = [
-      `images/${currentCat}/${file}`,
-      `images/${currentCat.toLowerCase()}/${file}`,
-      `images/${currentCat.toUpperCase()}/${file}`,
-      `./images/${currentCat}/${file}`,
-      `../images/${currentCat}/${file}`
-    ];
-
-    debug.textContent = `Trying to load: ${file}`;
-    console.log("Attempting to load image:", file, "from category:", currentCat);
-
-    // Add loading class
     img.classList.add('loading');
-    img.style.display = 'none'; // Hide until loaded
+    img.style.opacity = '0.5';
 
-    let imagesTried = 0;
-    const totalVariations = pathVariations.length;
+    const newImg = new Image();
+    
+    newImg.onload = () => {
+      img.src = path;
+      img.alt = `Manga4th Graphics - ${file}`;
+      img.classList.remove('loading');
+      img.style.opacity = '1';
+      
+      debug.textContent = `✓ ${file} (${currentIndex + 1}/${currentGallery.length})`;
+      updateImageCounter();
+      
+      preloadAdjacentImages();
+    };
 
-    function tryNextPath() {
-      if (imagesTried >= totalVariations) {
-        // All paths failed
-        img.classList.remove('loading');
-        debug.textContent = `ERROR: Could not load ${file} from any path`;
-        console.error("All path variations failed for:", file);
-        imageCounter.textContent = 'Image load failed';
-        img.style.display = 'none';
-        return;
-      }
+    newImg.onerror = () => {
+      img.classList.remove('loading');
+      img.style.opacity = '1';
+      debug.textContent = `✗ Failed to load: ${file}`;
+      
+      setTimeout(() => {
+        if (currentGallery.length > 1) {
+          navigate(1);
+        }
+      }, 1500);
+    };
 
-      const path = pathVariations[imagesTried];
-      console.log(`Trying path ${imagesTried + 1}:`, path);
-      debug.textContent = `Trying: ${path}`;
-
-      const testImage = new Image();
-      testImage.onload = function() {
-        // This path works!
-        img.src = path;
-        img.alt = `Manga4th Graphics - ${file}`;
-        img.style.display = 'block';
-        img.classList.remove('loading');
-        
-        debug.textContent = `✓ Loaded: ${file} (${currentIndex + 1}/${currentGallery.length})`;
-        updateImageCounter();
-        console.log("✓ Successfully loaded:", path);
-      };
-
-      testImage.onerror = function() {
-        imagesTried++;
-        console.log(`Path failed: ${path}`);
-        // Try next path
-        setTimeout(tryNextPath, 100);
-      };
-
-      testImage.src = path;
-    }
-
-    // Start trying paths
-    tryNextPath();
+    newImg.src = path;
   }
 
-  // UPDATE IMAGE COUNTER
   function updateImageCounter() {
     if (currentGallery.length > 0) {
       imageCounter.textContent = `${currentIndex + 1} / ${currentGallery.length}`;
@@ -152,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // NAVIGATION
   prevBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     navigate(-1);
@@ -170,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadImage();
   }
 
-  // KEYBOARD NAVIGATION
   document.addEventListener('keydown', (e) => {
     if (viewer.classList.contains('hidden')) return;
     
@@ -183,9 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // SWIPE SUPPORT FOR MOBILE
   let startX = 0;
-
   viewer.addEventListener('touchstart', (e) => {
     startX = e.touches[0].clientX;
   }, { passive: true });
@@ -195,30 +181,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const endX = e.changedTouches[0].clientX;
     const diff = startX - endX;
-    const minSwipeDistance = 50;
     
-    if (Math.abs(diff) > minSwipeDistance) {
-      if (diff > 0) {
-        navigate(1); // Swipe left - next
-      } else {
-        navigate(-1); // Swipe right - previous
-      }
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
     }
     
     startX = 0;
   }, { passive: true });
 
-  // CLOSE VIEWER WHEN CLICKING ON DARK BACKGROUND
   viewer.addEventListener('click', (e) => {
-    if (e.target === viewer || e.target.classList.contains('viewer')) {
+    if (e.target === viewer) {
       viewer.classList.add('hidden');
     }
   });
 
-  // SET CURRENT YEAR IN FOOTER
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // INITIAL DEBUG MESSAGE
+  
+  setTimeout(preloadFirstImages, 1000);
+  
   debug.textContent = 'Gallery ready - Click a category to start';
-  console.log('Gallery initialized successfully');
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          if (loadingScreen.parentNode) {
+            loadingScreen.parentNode.removeChild(loadingScreen);
+          }
+        }, 500);
+      }
+    }, 1000);
+  });
 });

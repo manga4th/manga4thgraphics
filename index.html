@@ -33,7 +33,7 @@
   </div>
 
   <!-- DEBUG -->
-  <div id="debug" style="color: #0f0; text-align: center; padding: 8px; font-family: monospace; font-size: 0.9rem;"></div>
+  <div id="debug" class="debug-info">Gallery ready - Click a category to start</div>
 
   <!-- IMAGE VIEWER -->
   <div id="viewer" class="viewer hidden">
@@ -51,6 +51,14 @@
   <footer class="footer">
     <p>© <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
   </footer>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Loading Manga4th Graphics...</p>
+    </div>
+  </div>
 
   <!-- JavaScript -->
   <script src="script.js" defer></script>
