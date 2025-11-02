@@ -4,27 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manga4th Graphics</title>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Poppins:wght@700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- TITLE -->
   <header class="site-title">
     <h1>MANGA4TH GRAPHICS</h1>
   </header>
 
-  <!-- LOGO (Centered) -->
   <div class="logo-container">
-    <img src="images/logo/manga4th-logo.png" alt="Manga4th Graphics Logo" class="main-logo" loading="eager">
+    <img src="images/logo/manga4th-logo.png" alt="Manga4th Graphics Logo" class="main-logo">
   </div>
 
-  <!-- CATEGORY BUTTONS -->
   <div class="button-grid">
     <button class="category-btn" data-cat="logo">Logos</button>
     <button class="category-btn" data-cat="posters">Posters</button>
@@ -32,35 +24,23 @@
     <button class="category-btn" data-cat="others">Others</button>
   </div>
 
-  <!-- DEBUG -->
-  <div id="debug" class="debug-info">Gallery ready - Click a category to start</div>
+  <div id="debug" class="debug-info">Click a category to view images</div>
 
-  <!-- IMAGE VIEWER -->
   <div id="viewer" class="viewer hidden">
     <button class="nav-btn prev-btn">
       <span class="material-icons">arrow_back</span>
     </button>
-    <img id="gallery-img" src="" alt="" loading="lazy">
+    <img id="gallery-img" src="" alt="">
     <button class="nav-btn next-btn">
       <span class="material-icons">arrow_forward</span>
     </button>
     <div class="image-counter" id="image-counter"></div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <p>© <span id="year"></span> Manga4th Graphics. All rights reserved.</p>
   </footer>
 
-  <!-- Loading Screen -->
-  <div id="loading-screen" class="loading-screen">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p>Loading Manga4th Graphics...</p>
-    </div>
-  </div>
-
-  <!-- JavaScript -->
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
